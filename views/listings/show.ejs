@@ -1,25 +1,30 @@
 <% layout("/layouts/boilerplate.ejs") -%>
- <!-- this layout means the boilerplate part 
+<!-- this layout means the boilerplate part 
   comes here and in the div section 
   body go inside the div-body part -->
-  <body>
-        <h3>Listing Details: </h3>
-   <ul>
-    <li><%=listing.title%></li>
-    <li><%=listing.description%></li>
-    <li><%= listing.price ? "₹" + listing.price.toLocaleString("en-IN") : 5000 + " /night"  %></li>
-    <li><%=listing.location%></li>
-    <li><%=listing.country%></li>
-   </ul>
-   <br>
-   <a class="edit" href="/listings/<%=listing._id%>/edit">Edit</a>
-   <br>
-   <br>
-   <form method="POST" action="/listings/<%=listing._id%>?_method=Delete">
-    <button class="btn">Delete</button>
-   </form>
-  </body>
-
-
-
+<div class="row mt-3">
+  <div class="col-8 offset-3 mb-3">
+  <h3>Listing Details:</h3>
+  </div>
+  <div class="card col-6 offset-3 show-card" >
+    <img src="<%= listing.image.url %>" class="card-img-top" alt="listing_image" />
+    <div class="card-body">
+      <p class="card-text">
+        <b><%=listing.title%></b><br>
+        <%=listing.description%><br>
+        n price &#36; <% if (listing.price != null) { %> <%=
+      listing.price.toLocaleString("en-US") %> <% } else { %> N/A <% } %><br>
+      <%=listing.location%><br>
+      <%=listing.country%>
+      </p>
+    </div>
+  </div>
+  </div>
+  <div class="btns col-6 offset-3">
+    <a class="edit mt-3" href="/listings/<%=listing._id%>/edit">Edit</a>
+  <form method="POST" action="/listings/<%=listing._id%>?_method=Delete">
+    <button class="delete mt-3 mb-2">Delete</button>
+  </form>
+  </div>
+  
 
