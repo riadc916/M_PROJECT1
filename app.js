@@ -17,6 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(methodOverride("_method"));
 app.engine('ejs', engine);
+app.use(express.json());
 
 
 //npm init -y///npm i express///npm i ejs///npm i mongoose///npm i method-verride
@@ -49,10 +50,10 @@ async function main() {
 // })
 
 //index route
-app.get("/listings", async (req, res) => {
+app.get("/listings", wrapAsync(async (req, res) => {
     const alllistings = await Listing.find({});
     res.render("../views/listings/index.ejs", { alllistings });
-})
+}));
 
 
 //new route
@@ -61,12 +62,14 @@ app.get("/listings/new", (req, res) => {
 })
 
 //show route
-app.get("/listings/:id", async (req, res) => {
+app.get("/listings/:id", wrapAsync(async (req, res) => {
     let { id } = req.params;
     const listing = await Listing.findById(id);
     res.render("../views/listings/show.ejs", { listing });
 
-})
+}))
+
+
 // // create route
 // app.post("/listings",async(req,res,next)=>{
 //     try{
@@ -78,7 +81,11 @@ app.get("/listings/:id", async (req, res) => {
 //     }
 
 // })
+//create route
 app.post("/listings", wrapAsync(async (req, res, next) => {
+    if(!req.body   || !req.body.listing){
+       throw new ExpressError(400,"Invalid Listing Data")
+    }
     const listingData = req.body.listing;
     listingData.image = {
         url: listingData.image,
@@ -86,37 +93,38 @@ app.post("/listings", wrapAsync(async (req, res, next) => {
     };
     const newlisting = new Listing(listingData);
     await newlisting.save();
-    console.log(newlisting);
     res.redirect("/listings");
-    console.log(req.body)
 })
 )
 //edit route
-app.get("/listings/:id/edit", async (req, res) => {
+app.get("/listings/:id/edit", wrapAsync(async (req, res) => {
     let { id } = req.params;
     const listing = await Listing.findById(id);
     res.render("../views/listings/edit.ejs", { listing });
-})
+}))
 
 //update edit route
-app.put("/listings/:id", async (req, res) => {
+app.put("/listings/:id", wrapAsync(async (req, res) => {
+     if(!req.body   || !req.body.listing){
+       throw new ExpressError(400,"Invalid Listing Data")
+    }
     let { id } = req.params;
     await Listing.findByIdAndUpdate(id, { ...req.body.listing });
     res.redirect(`/listings/${id}`);
-})
+}))
 //delete route
-app.delete("/listings/:id", async (req, res) => {
+app.delete("/listings/:id", wrapAsync(async (req, res) => {
     let { id } = req.params;
     await Listing.findByIdAndDelete(id);
     res.redirect("/listings");
-})
+}))
 
 app.get("/", (req, res) => {
     // res.send("Hi, I am root");
     res.render("../views/listings/home.ejs");
 })
 
-
+//for all the route
 app.all(/^.*$/,(req,res,next)=>{
     next(new ExpressError(404,"page not found"))
 })
@@ -124,8 +132,9 @@ app.all(/^.*$/,(req,res,next)=>{
 //error handeling
 //Destructuring mane holo 
 app.use((err, req, res, next) => {
-    let{statusCode,message}=err;
-    res.status(statusCode).send(message);
+    let{statusCode=500,message="Something went wrong"}=err;
+    // res.status(statusCode).send(message);
+    res.render("error.ejs");
 })
 
 
