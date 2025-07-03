@@ -8,7 +8,8 @@ const methodOverride = require("method-override");
 const engine = require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError=require("./utils/Expresserror.js");
-
+const { error } = require("console");
+const {listingSchema}=require("./joiSchema.js");
 
 
 app.set("view engine", "ejs");
@@ -49,6 +50,20 @@ async function main() {
 //   res.send(show);
 // })
 
+
+
+const validateListing=(req,res,next)=>{
+    let {error}=listingSchema.validate(req.body);
+    if(error){
+        throw new ExpressError(400,error);
+    }else{
+        next();   //next er kaj holo route   (req,res){} eita hocche route/route handeler  and /listing route path
+    }
+};
+
+
+
+
 //index route
 app.get("/listings", wrapAsync(async (req, res) => {
     const alllistings = await Listing.find({});
@@ -82,10 +97,7 @@ app.get("/listings/:id", wrapAsync(async (req, res) => {
 
 // })
 //create route
-app.post("/listings", wrapAsync(async (req, res, next) => {
-    if(!req.body   || !req.body.listing){
-       throw new ExpressError(400,"Invalid Listing Data")
-    }
+app.post("/listings",validateListing, wrapAsync(async (req, res, next) => {
     const listingData = req.body.listing;
     listingData.image = {
         url: listingData.image,
@@ -104,10 +116,7 @@ app.get("/listings/:id/edit", wrapAsync(async (req, res) => {
 }))
 
 //update edit route
-app.put("/listings/:id", wrapAsync(async (req, res) => {
-     if(!req.body   || !req.body.listing){
-       throw new ExpressError(400,"Invalid Listing Data")
-    }
+app.put("/listings/:id",validateListing, wrapAsync(async (req, res) => {
     let { id } = req.params;
     await Listing.findByIdAndUpdate(id, { ...req.body.listing });
     res.redirect(`/listings/${id}`);
@@ -130,11 +139,11 @@ app.all(/^.*$/,(req,res,next)=>{
 })
 
 //error handeling
-//Destructuring mane holo 
+//Destructuring mane holo let {statusCode=500,message="something"}=err;
 app.use((err, req, res, next) => {
     let{statusCode=500,message="Something went wrong"}=err;
     // res.status(statusCode).send(message);
-    res.render("error.ejs");
+    res.status(statusCode).render("error.ejs",{message});
 })
 
 
