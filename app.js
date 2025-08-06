@@ -9,10 +9,14 @@ const ExpressError=require("./utils/Expresserror.js");
 const session=require("express-session")
 const flash=require("connect-flash");  //this is for flash message show in the browser 
 //  we create a new listing
+const passport=require("passport");
+const LocalStrategy = require("passport-local").Strategy;   
+const User=require("./models/user.js");
 
 
 const listingsRouter=require("./routers/listing.js");
-const reviews = require("./routers/review.js");
+const reviewsRouter= require("./routers/review.js");
+const userRouter= require("./routers/user.js");
 
 
 app.set("view engine", "ejs");
@@ -34,20 +38,6 @@ const sessionOptions={
         httpOnly: true,
     },
 }
-
-app.use(session(sessionOptions))
-app.use(flash());
-
-//npm init -y///npm i express///npm i ejs///npm i mongoose///npm i method-verride
-
-
-app.use((req,res,next)=>{
-    res.locals.success=req.flash("success");
-    res.locals.error=req.flash("error");
-    next();
-})
-
-
 main()
     .then(() => {
         console.log("connected to DB")
@@ -61,10 +51,60 @@ async function main() {
 }
 
 
+app.use(session(sessionOptions))
+app.use(flash());
+
+
+app.use(passport.initialize());
+app.use(passport.session());
+// use static authenticate method of model in LocalStrategy
+passport.use(new LocalStrategy(User.authenticate()));
+
+// use static serialize and deserialize of model for passport session support
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+// Step-by-step Workflow:
+// User Login Form Submit করে
+
+// Passport.js → email/password যাচাই করে (strategy দিয়ে)
+
+// Passport.js → ইউজারকে session এ রাখে
+
+// Express-session → সেই session এর একটা session ID generate করে
+
+// Browser-এ cookie হিসেবে connect.sid=xyz পাঠায়
+
+// এরপর যতবার request আসে, সেই cookie (session ID) পাঠায়
+
+// Server সেই session ID দিয়ে বুঝে নেয় ইউজার কে
+//npm init -y///npm i express///npm i ejs///npm i mongoose///npm i method-verride
+// //npm i passport //passport-local //passport-local-mongoose its only use for authenticationA
+
+
+app.use((req,res,next)=>{
+    res.locals.success=req.flash("success");
+    res.locals.error=req.flash("error");
+    next();
+})
+
+
+// //passport authentitaciton
+// app.get("/demouser",async(req,res)=>{
+//     let fakeUser=new User({
+//         email:"riadc916@gmail.com",s
+//         username:"riadc916"
+//     })
+//     let registeredUser= await User.register(fakeUser, "helloworld")
+//     res.send(registeredUser);
+// })
+
+
+
 
 app.use("/listings",listingsRouter);  //this is for listing route  etar 
 // nam hocce expressrouter jeta kina code ke more readable kore
-app.use("/listings/:id/reviews",reviews)
+app.use("/listings/:id/reviews",reviewsRouter)
+app.use("/",userRouter);  //this is for user route
 
 
 
