@@ -4,6 +4,8 @@ const wrapAsync = require("../utils/wrapAsync.js");
 const {listingSchema}=require("../joiSchema.js");  //for joi schema validation 
 const ExpressError=require("../utils/Expresserror.js");
 const Listing = require("../models/listing.js");
+const User=require("./user.js");  //for user authentication check
+const {isLoggedIn}=require("../middleware.js");
 
 
 
@@ -26,9 +28,9 @@ router.get("/", wrapAsync(async (req, res) => {
 
 
 //new route
-router.get("/new", (req, res) => {
-    res.render("../views/listings/new.ejs");
-})
+router.get("/new",isLoggedIn, (req, res) => {
+        res.render("../views/listings/new.ejs");
+});
 
 //show route
 router.get("/:id", wrapAsync(async (req, res) => {
@@ -43,7 +45,7 @@ router.get("/:id", wrapAsync(async (req, res) => {
 }))
 
 //create route
-router.post("/",validateListing, wrapAsync(async (req, res, next) => {
+router.post("/",validateListing,isLoggedIn, wrapAsync(async (req, res, next) => {
     const listingData = req.body.listing;
     listingData.image = {
         url: listingData.image,
@@ -56,21 +58,21 @@ router.post("/",validateListing, wrapAsync(async (req, res, next) => {
 })
 )
 //edit route
-router.get("/:id/edit", wrapAsync(async (req, res) => {
+router.get("/:id/edit",isLoggedIn, wrapAsync(async (req, res) => {
     let { id } = req.params;
     const listing = await Listing.findById(id);
     res.render("../views/listings/edit.ejs", { listing });
 }))
 
 //update edit route
-router.put("/:id",validateListing, wrapAsync(async (req, res) => {
+router.put("/:id",validateListing,isLoggedIn, wrapAsync(async (req, res) => {
     let { id } = req.params;
     await Listing.findByIdAndUpdate(id, { ...req.body.listing });
     req.flash("success","Successfully updated the listing!");
     res.redirect(`/listings/${id}`);
 }))
 //delete route
-router.delete("/:id", wrapAsync(async (req, res) => {
+router.delete("/:id",isLoggedIn, wrapAsync(async (req, res) => {
     let { id } = req.params;
     await Listing.findOneAndDelete({ _id: id });
     req.flash("success","Successfully delete the listing!");

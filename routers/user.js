@@ -41,5 +41,16 @@ router.post(
     res.redirect("/listings");
   }
 );
+//logout info
+//logout is a passport method
+router.get("/logout",(req,res)=>{
+  req.logout((err)=>{
+    if(err){
+      return next(err);
+    }
+    req.flash("success","Successfully logged out!")
+    res.redirect("/listings");
+  })
+})
 
 module.exports = router;
