@@ -5,28 +5,31 @@ const Listing = require("../models/listing.js");
 const User = require("./user.js"); //for user authentication check
 const { isLoggedIn, isOwner, validateListing } = require("../middleware.js");
 
-const listingController=require("../controllers/listing.js");
+const listingController = require("../controllers/listing.js");
+const multer  = require('multer')   //used for image/video upload files
+const { storage } = require("../cloudConfig.js");
+const upload = multer({ storage})
 
-//index route
-router.get(
-  "/",
-  wrapAsync(listingController.indexcontroller) //using the index function from listingControllerss
-);
+router //this is going to handle the index/create route for listings because index and create are in the same route
+  .route("/")
+  .get(wrapAsync(listingController.indexcontroller)) //using the index function from listingControllerss/ /index route
+  .post(
+    isLoggedIn,
+    validateListing, //create route
+    upload.single("listing[image]"),
+    wrapAsync(listingController.createrouter)
+  );
 
 //new route
-router.get("/new", isLoggedIn,listingController.newcontroller);
+router.get("/new", isLoggedIn, listingController.newcontroller);
 
-//show route
-router.get(
-  "/:id",
-  wrapAsync(listingController.showcontroller));
-
-//create route
-router.post(
-  "/",
-  validateListing,
-  isLoggedIn,
-  wrapAsync(listingController.createrouter));
+router
+  .route("/:id")   //this is going to handle the show/update/delete route for listings
+  .get(wrapAsync(listingController.showcontroller))
+  .put((isLoggedIn, isOwner,validateListing, wrapAsync(listingController.updatecontroller)))
+  .delete(isLoggedIn,
+  isOwner,
+  wrapAsync(listingController.deletecontroller));
 
 //edit route
 router.get(
@@ -34,22 +37,6 @@ router.get(
   isLoggedIn,
   isOwner,
   wrapAsync(listingController.editcontroller)
-);
-
-//update edit route
-router.put(
-  "/:id",
-  isLoggedIn,
-  isOwner,
-  validateListing,
-  wrapAsync(listingController.updatecontroller)
-);
-//delete route
-router.delete(
-  "/:id",
-  isLoggedIn,
-  isOwner,
-  wrapAsync(listingController.deletecontroller)
 );
 
 module.exports = router;

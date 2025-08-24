@@ -7,20 +7,17 @@ const { saveRedirectUrl } = require("../middleware.js");
 
 const usercontroller=require("../controllers/user.js");
 
-//For signuo info
-router.get("/signup", usercontroller.rendersignup);
-
-router.post(
-  "/signup",
-  wrapAsync(usercontroller.signupcontroller));
-
-//for login info
-router.get("/login", usercontroller.renderlogin);
 
 
-router.post(
-  "/login",
-  saveRedirectUrl,
+router.route("/signup")   //for signup info
+.get( usercontroller.rendersignup)
+.post(wrapAsync(usercontroller.signupcontroller));
+
+
+
+router.route("/login")   //this is for login info
+.get(usercontroller.renderlogin)
+.post(saveRedirectUrl,
   passport.authenticate("local", {
     //er kaj hocce user ke authenticate kora
     failureRedirect: "/login",
@@ -28,6 +25,7 @@ router.post(
   }),
   usercontroller.login
 );
+
 
 //logout info
 //logout is a passport method

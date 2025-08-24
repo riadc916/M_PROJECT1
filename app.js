@@ -1,3 +1,22 @@
+// Passport.js → email/password যাচাই করে (strategy দিয়ে)
+
+// Passport.js → ইউজারকে session এ রাখে
+
+// Express-session → সেই session এর একটা session ID generate করে
+
+// Browser-এ cookie হিসেবে connect.sid=xyz পাঠায়
+
+// এরপর যতবার request আসে, সেই cookie (session ID) পাঠায়
+
+// Server সেই session ID দিয়ে বুঝে নেয় ইউজার কে
+//npm init -y///npm i express///npm i ejs///npm i mongoose///npm i method-verride//npm i multer//npm i cloudinary//npm i multer-storage-cloudinary
+// //npm i passport //passport-local //passport-local-mongoose its only use for authenticationA
+
+
+if(process.env.NODE_ENV !="production"){
+    require('dotenv').config()
+}
+
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -66,19 +85,6 @@ passport.deserializeUser(User.deserializeUser());
 // Step-by-step Workflow:
 // User Login Form Submit করে
 
-// Passport.js → email/password যাচাই করে (strategy দিয়ে)
-
-// Passport.js → ইউজারকে session এ রাখে
-
-// Express-session → সেই session এর একটা session ID generate করে
-
-// Browser-এ cookie হিসেবে connect.sid=xyz পাঠায়
-
-// এরপর যতবার request আসে, সেই cookie (session ID) পাঠায়
-
-// Server সেই session ID দিয়ে বুঝে নেয় ইউজার কে
-//npm init -y///npm i express///npm i ejs///npm i mongoose///npm i method-verride
-// //npm i passport //passport-local //passport-local-mongoose its only use for authenticationA
 
 
 app.use((req,res,next)=>{
@@ -87,18 +93,6 @@ app.use((req,res,next)=>{
     res.locals.currUser=req.user;
     next();
 })
-
-
-// //passport authentitaciton
-// app.get("/demouser",async(req,res)=>{
-//     let fakeUser=new User({
-//         email:"riadc916@gmail.com",s
-//         username:"riadc916"
-//     })
-//     let registeredUser= await User.register(fakeUser, "helloworld")
-//     res.send(registeredUser);
-// })
-
 
 
 

@@ -31,11 +31,14 @@ module.exports.showcontroller=async (req, res) => {
   }
 
 module.exports.createrouter=async (req, res, next) => {
+  let url=req.file.path;
+  let filename=req.file.filename;   
     const listingData = req.body.listing;
     listingData.image = {
       url: listingData.image,
       filename: "custom-filename", // or extract from URL if needed
     };
+    listingData.image={url,filename};
     const newlisting = new Listing(listingData);
     newlisting.owner = req.user._id;
     await newlisting.save();
@@ -49,12 +52,26 @@ module.exports.createrouter=async (req, res, next) => {
     res.render("../views/listings/edit.ejs", { listing });
   }
 
-  module.exports.updatecontroller=async (req, res) => {
-    let { id } = req.params;
-    await Listing.findByIdAndUpdate(id, { ...req.body.listing });
-    req.flash("success", "Successfully updated the listing!");
-    res.redirect(`/listings/${id}`);
+  // module.exports.updatecontroller=async (req, res) => {
+  //   let { id } = req.params;
+  //   await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+  //   req.flash("success", "Successfully updated the listing!");
+  //   res.redirect(`/listings/${id}`);
+  // }
+
+  module.exports.updatecontroller = async (req, res) => {
+  let { id } = req.params;
+  const listingData = req.body.listing;
+
+  // যদি image object থেকে url আসে, তাহলে filename ম্যানুয়ালি দিয়ে দাও
+  if (listingData.image && listingData.image.url) {
+    listingData.image.filename = "updated-from-edit"; // অথবা ইচ্ছেমত কিছু
   }
+
+  await Listing.findByIdAndUpdate(id, listingData);
+  req.flash("success", "Successfully updated the listing!");
+  res.redirect(`/listings/${id}`);
+};
 
   module.exports.deletecontroller=async (req, res) => {
     let { id } = req.params;
