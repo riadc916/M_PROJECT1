@@ -31,14 +31,14 @@ module.exports.showcontroller=async (req, res) => {
   }
 
 module.exports.createrouter=async (req, res, next) => {
-  let url=req.file.path;
-  let filename=req.file.filename;   
+  let url=req.file.path;    //use cloudinary
+  let filename=req.file.filename;   //here use cloudinary
     const listingData = req.body.listing;
     listingData.image = {
       url: listingData.image,
       filename: "custom-filename", // or extract from URL if needed
     };
-    listingData.image={url,filename};
+    listingData.image={url,filename};  //use cloudinary
     const newlisting = new Listing(listingData);
     newlisting.owner = req.user._id;
     await newlisting.save();
