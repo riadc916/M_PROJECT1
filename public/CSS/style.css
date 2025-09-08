@@ -24,9 +24,9 @@ body{
    flex: 1;
 }
 
-.edit,.delete{
+ .edit,.delete{
    text-decoration: none;
-   /* border: 2px solid; */
+    border: 2px solid; 
    padding: 2px 4px;
    border-radius: 36px;
    cursor: pointer;
@@ -34,14 +34,16 @@ body{
    outline: none;
    border: none;
    color:  white;
-}
+} 
 
 .edit{
    background-color: rgb(3, 131, 3);
 }
 .delete{
    background-color: red;
-}
+} 
+
+
 /* .edit:hover{
    /* background-color: green; */
    /* color: white;
@@ -138,3 +140,4 @@ body{
   .alert-heading{
    width: 100%;
   }
+

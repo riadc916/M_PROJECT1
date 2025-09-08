@@ -13,11 +13,11 @@
 // //npm i passport //passport-local //passport-local-mongoose its only use for authenticationA
 
 
-if(process.env.NODE_ENV !="production"){
+if(process.env.NODE_ENV !="production"){  
     require('dotenv').config()
 }
 
-const express = require("express");
+const express=require("express");
 const app = express();
 const mongoose = require("mongoose");
 const path = require("path");
@@ -26,6 +26,7 @@ const methodOverride = require("method-override");
 const engine = require("ejs-mate");
 const ExpressError=require("./utils/Expresserror.js");
 const session=require("express-session")
+const MongoStore = require('connect-mongo');
 const flash=require("connect-flash");  //this is for flash message show in the browser 
 //  we create a new listing
 const passport=require("passport");
@@ -47,7 +48,23 @@ app.engine('ejs', engine);
 app.use(express.json());
 
 
+const dbUrl=process.env.ATLASDB_URL   
+//here we use the env file and we set database atlas database url in the env file
+
+const store=MongoStore.create({
+    mongoUrl: dbUrl,
+    crypto: {
+    secret: "mysecretSession"
+  },
+  touchAfter:24*3600
+  })
+
+  store.on("error",(err)=>{
+    console.log("mongo session error",err)
+  })
+
 const sessionOptions={
+    store,
     secret:"mysecretSession",
     resave:false,
     saveUninitialized:true,
@@ -57,6 +74,11 @@ const sessionOptions={
         httpOnly: true,
     },
 }
+
+
+
+
+
 main()
     .then(() => {
         console.log("connected to DB")
@@ -65,8 +87,9 @@ main()
         console.log(err)
     })
 
+
 async function main() {
-    await mongoose.connect('mongodb://127.0.0.1:27017/wanderlust');
+    await mongoose.connect(dbUrl);
 }
 
 

@@ -1,0 +1,21 @@
+project/
+├─ app.js
+├─ .env                 # CLOUD_NAME, CLOUD_API_KEY, CLOUD_API_SECRET, SESSION_SECRET
+├─ /models
+│  ├─ listing.js
+│  └─ user.js
+├─ /controllers
+│  ├─ listing.js
+│  └─ user.js
+├─ /routes
+│  ├─ listing.js
+│  └─ user.js
+├─ /middlewares
+│  └─ upload.js
+├─ /utils
+│  └─ ExpressError.js
+├─ /config
+│  └─ cloudConfig.js
+└─ /views
+   ├─ listings/*.ejs
+   └─ users/*.ejs

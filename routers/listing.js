@@ -9,24 +9,27 @@ const listingController = require("../controllers/listing.js");
 const multer  = require('multer')   //used for image/video upload files
 const { storage } = require("../cloudConfig.js");
 const upload = multer({ storage})
-
+  
 router //this is going to handle the index/create route for listings because index and create are in the same route
   .route("/")
   .get(wrapAsync(listingController.indexcontroller)) //using the index function from listingControllerss/ /index route
   .post(
-    isLoggedIn,
+    isLoggedIn, 
     validateListing, //create route
-    upload.single("listing[image]"),
+    upload.single("listing[image]"), 
     wrapAsync(listingController.createrouter)
   );
 
+
+router.get("/search",wrapAsync(listingController.searchcontroller))
 //new route
 router.get("/new", isLoggedIn, listingController.newcontroller);
 
 router
   .route("/:id")   //this is going to handle the show/update/delete route for listings
   .get(wrapAsync(listingController.showcontroller))
-  .put((isLoggedIn, isOwner,validateListing, wrapAsync(listingController.updatecontroller)))
+                            //why upload is before validatelisting because first we multer parse the image then save the image in the cloudinary and then validate the rest of the data
+  .put(isLoggedIn, isOwner,upload.single("listing[image]"),validateListing,wrapAsync(listingController.updatecontroller))
   .delete(isLoggedIn,
   isOwner,
   wrapAsync(listingController.deletecontroller));
@@ -38,5 +41,9 @@ router.get(
   isOwner,
   wrapAsync(listingController.editcontroller)
 );
+  
+router.get("/category/:category",isLoggedIn,wrapAsync(listingController.categorycontroller))
+
+
 
 module.exports = router;
