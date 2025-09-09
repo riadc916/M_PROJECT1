@@ -17,23 +17,23 @@
 }
 
 .starability-result[data-rating="5"]::after {
-  width: 150px;
+  width: 100%;
 }
 
 .starability-result[data-rating="4"]::after {
-  width: 120px;
+  width: 80%;
 }
 
 .starability-result[data-rating="3"]::after {
-  width: 90px;
+  width: 60%;
 }
 
 .starability-result[data-rating="2"]::after {
-  width: 60px;
+  width: 40%;
 }
 
 .starability-result[data-rating="1"]::after {
-  width: 30px;
+  width: 20%;
 }
 
 @media screen and (-webkit-min-device-pixel-ratio: 2), screen and (min-resolution: 192dpi) {
